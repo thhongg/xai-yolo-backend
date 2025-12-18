@@ -73,7 +73,7 @@ This Hub model acts as the **single source of truth** for:
 - Model versioning
 - Model sharing
 - Reproducibility
-- 
+
 ---
 ### Optional: Load model directly from Ultralytics Hub
 
