@@ -1,0 +1,66 @@
+# ==============================
+# Environment & secrets
+# ==============================
+.env
+.env.*
+
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+.venv/
+venv/
+ENV/
+
+# ==============================
+# ML / Model artifacts
+# ==============================
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.engine
+models/*.weights
+
+# ==============================
+# Runtime generated files
+# ==============================
+tmp/
+temp/
+cache/
+logs/
+*.log
+
+# ==============================
+# Image / inference outputs
+# ==============================
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.tiff
+*.npy
+
+# ==============================
+# Jupyter / experiments (nếu có)
+# ==============================
+.ipynb_checkpoints/
+notebooks/
+
+# ==============================
+# OS / Editor
+# ==============================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ==============================
+# Docker
+# ==============================
+docker-compose.override.yml

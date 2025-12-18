@@ -1,0 +1,14 @@
+# --- FastAPI stack (let FastAPI resolve deps) ---
+fastapi==0.115.0
+uvicorn==0.38.0
+
+# --- Upload & utils ---
+python-multipart==0.0.20
+python-dotenv>=1.0.1
+
+# --- Data / image utils ---
+numpy>=1.24
+Pillow>=10.0
+
+# --- storage ---
+minio>=7.2.0
