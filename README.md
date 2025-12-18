@@ -59,18 +59,9 @@ Model artifacts (`.pt`, `.onnx`) are **NOT committed**, in compliance with **12-
 ⚠️ **Model file is NOT included in this repository.**
 
 The YOLOv8m model is trained and hosted on **Ultralytics Hub**, which acts as a **Model Registry** (similar to HuggingFace Hub or MLflow Registry).
+The backend expects a YOLOv8-compatible PyTorch model, either loaded locally
+or resolved via Ultralytics Hub.
 
----
-### Optional: Load model directly from Ultralytics Hub
-
-Instead of downloading the `.pt` file manually, the model can be loaded
-directly from Ultralytics Hub:
-
-```python
-from ultralytics import YOLO
-
-model = YOLO("https://hub.ultralytics.com/models/QfV3QWptr2E9CldzLQCr")
-```
 ## 4.1. Model Registry (Ultralytics Hub)
 
 The trained YOLOv8m model is publicly available on **Ultralytics Hub**:
@@ -82,6 +73,18 @@ This Hub model acts as the **single source of truth** for:
 - Model versioning
 - Model sharing
 - Reproducibility
+- 
+---
+### Optional: Load model directly from Ultralytics Hub
+
+Instead of downloading the `.pt` file manually, the model can be loaded
+directly from Ultralytics Hub:
+
+```python
+from ultralytics import YOLO
+
+model = YOLO("https://hub.ultralytics.com/models/QfV3QWptr2E9CldzLQCr")
+```
 
 ### 4.2. Place model locally
 
@@ -129,3 +132,9 @@ python app/main.py
 curl -X POST http://localhost:8000/infer \
   -F "file=@image.jpg"
 ```
+The response includes:
+- Bounding boxes
+- Class labels
+- Confidence scores
+- EigenCAM heatmap visualization
+
