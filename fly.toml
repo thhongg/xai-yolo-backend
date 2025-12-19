@@ -1,0 +1,26 @@
+app = "xai-yolo-backend"
+
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "connections"
+    soft_limit = 10
+    hard_limit = 20
+
+[checks]
+  [checks.http]
+    grace_period = "60s"
+    interval = "15s"
+    method = "GET"
+    path = "/docs"
+    timeout = "10s"
