@@ -1,32 +1,43 @@
-import torch
+import os
+from huggingface_hub import hf_hub_download
 from ultralytics import YOLO
 
-# Singleton-style loader (12-factor: load once)
-_yolo_model = None
-_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+_model = None
+_target_layer = None
+
+def get_model():
+    global _model
+    if _model is not None:
+        return _model
+
+    repo_id = os.getenv("MODEL_REPO")
+    filename = os.getenv("MODEL_FILE", "model.pt")
+    model_dir = os.getenv("MODEL_DIR", "/app/models")
+
+    if not repo_id:
+        raise RuntimeError("MODEL_REPO env variable is not set")
+
+    os.makedirs(model_dir, exist_ok=True)
+
+    model_path = hf_hub_download(
+        repo_id=repo_id,
+        filename=filename,
+        local_dir=model_dir,
+        local_dir_use_symlinks=False
+    )
+
+    _model = YOLO(model_path)
+    return _model
 
 
-def load_model(model_path: str):
-    global _yolo_model
-
-    if _yolo_model is None:
-        yolo = YOLO(model_path)
-        yolo.model.to(_device)
-        yolo.model.eval()
-        _yolo_model = yolo
-
-    return _yolo_model
-
-
-def get_device():
-    return _device
-
-
-def get_eigencam_target_layer(yolo):
+def get_eigencam_target_layer(model):
     """
-    Target layer chuẩn cho YOLOv8m:
-    - Layer cuối backbone (C2f)
-    - Phù hợp EigenCAM (feature-rich, spatial)
+    Return backbone layer for EigenCAM (YOLOv8m).
     """
-    # YOLOv8 backbone thường nằm ở model.model[:8]
-    return yolo.model.model[7]
+    global _target_layer
+    if _target_layer is not None:
+        return _target_layer
+
+    # YOLOv8 backbone: model.model.model[:8]
+    _target_layer = model.model.model[7]
+    return _target_layer

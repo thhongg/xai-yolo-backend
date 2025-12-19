@@ -3,6 +3,7 @@
 # ==============================
 .env
 .env.*
+!.env.example
 
 # ==============================
 # Python
@@ -21,11 +22,12 @@ ENV/
 # ==============================
 # ML / Model artifacts
 # ==============================
-models/*.pt
-models/*.pth
-models/*.onnx
-models/*.engine
-models/*.weights
+models/
+*.pt
+*.pth
+*.onnx
+*.engine
+*.weights
 
 # ==============================
 # Runtime generated files
@@ -37,8 +39,11 @@ logs/
 *.log
 
 # ==============================
-# Image / inference outputs
+# Inference / XAI outputs
 # ==============================
+artifacts/
+outputs/
+results/
 *.jpg
 *.jpeg
 *.png
@@ -47,7 +52,7 @@ logs/
 *.npy
 
 # ==============================
-# Jupyter / experiments (nếu có)
+# Jupyter / experiments
 # ==============================
 .ipynb_checkpoints/
 notebooks/

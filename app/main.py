@@ -1,28 +1,24 @@
 from fastapi import FastAPI, UploadFile, File
 import cv2
 import uuid
-import os
 
 from app.services.storage import upload_image
-from app.services.model_loader import load_model, get_eigencam_target_layer
+from app.services.model_loader import get_model, get_eigencam_target_layer
 from app.services.detector import run_detection
 from app.services.eigencam import run_eigencam
 from app.services.visualizer import draw_detections, overlay_heatmap
 from app.core.preprocess import preprocess_image
 
+app = FastAPI(title="XAI YOLOv8 Backend")
 
-MODEL_PATH = "models/model.pt"
-
-app = FastAPI()
-yolo = load_model(MODEL_PATH)
-target_layer = get_eigencam_target_layer(yolo)
+# ❌ KHÔNG preload model trong startup
 
 
 @app.post("/infer")
 async def infer(file: UploadFile = File(...)):
     inference_id = str(uuid.uuid4())
 
-    # ---- 1. Save input tạm thời (ephemeral) ----
+    # ---- 1. Save input (ephemeral FS) ----
     tmp_input_path = f"/tmp/{inference_id}_input.jpg"
     with open(tmp_input_path, "wb") as f:
         f.write(await file.read())
@@ -30,11 +26,14 @@ async def infer(file: UploadFile = File(...)):
     original_image, input_tensor = preprocess_image(tmp_input_path)
 
     # ---- 2. Detection ----
-    detections, results = run_detection(yolo, original_image)
+    model = get_model()
+    target_layer = get_eigencam_target_layer(model)
+
+    detections, results = run_detection(model, original_image)
 
     # ---- 3. EigenCAM ----
     heatmap = run_eigencam(
-        yolo,
+        model,
         target_layer,
         input_tensor,
         original_image
