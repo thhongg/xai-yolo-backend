@@ -65,3 +65,7 @@ async def infer(file: UploadFile = File(...)):
             "overlay": overlay_url
         }
     }
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
