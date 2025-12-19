@@ -1,45 +1,11 @@
-# =====================================================
-# Stage 1: Base (HEAVY – build once, cache lâu)
-# =====================================================
-FROM python:3.10-slim AS base
+FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# System deps
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libgl1 \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip install --upgrade pip
-
-# ---- Torch CPU (ổn định cho Railway) ----
-RUN pip install --no-cache-dir \
-    torch==2.9.1 \
-    ultralytics \
-    grad-cam \
-    opencv-python-headless
-
-# Sanity check
-RUN python - <<EOF
-import torch
-from pytorch_grad_cam import EigenCAM
-print("Torch OK:", torch.__version__)
-print("EigenCAM OK")
-EOF
-
-
-# =====================================================
-# Stage 2: Runtime (APP + FASTAPI)
-# =====================================================
-FROM python:3.10-slim AS runtime
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Runtime system deps
+# ----------------------------------------------------
+# System dependencies (tối thiểu cho OpenCV)
+# ----------------------------------------------------
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
@@ -47,16 +13,66 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy Python env đã build
-COPY --from=base /usr/local /usr/local
+# ----------------------------------------------------
+# Upgrade pip
+# ----------------------------------------------------
+RUN pip install --upgrade pip
 
-# ---- INSTALL FASTAPI STACK (QUAN TRỌNG) ----
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# ----------------------------------------------------
+# Torch CPU ONLY (KHÓA – không cho pip upgrade)
+# ----------------------------------------------------
+RUN pip install --no-cache-dir \
+    torch==2.2.2+cpu \
+    torchvision==0.17.2+cpu \
+    --index-url https://download.pytorch.org/whl/cpu
 
-# Copy app source
+
+# ----------------------------------------------------
+# Ultralytics MINIMAL deps (cài tay)
+# ----------------------------------------------------
+RUN pip install --no-cache-dir \
+    psutil \
+    pyyaml \
+    tqdm \
+    matplotlib \
+    seaborn \
+    requests
+
+# ----------------------------------------------------
+# ML libs (KHÔNG deps → KHÔNG torchvision)
+# ----------------------------------------------------
+# Ultralytics – khóa deps
+RUN pip install --no-cache-dir \
+    ultralytics==8.2.* \
+    --no-deps
+
+# XAI stack – cho phép deps tự resolve
+RUN pip install --no-cache-dir \
+    grad-cam \
+    opencv-python-headless
+
+# ----------------------------------------------------
+# App-level dependencies
+# ----------------------------------------------------
+RUN pip install --no-cache-dir \
+    fastapi==0.115.0 \
+    uvicorn==0.38.0 \
+    python-multipart==0.0.20 \
+    python-dotenv>=1.0.1 \
+    numpy==1.26.4 \
+    Pillow>=10.0 \
+    boto3>=1.34.0 \
+    huggingface_hub>=0.22.0
+
+
+# ----------------------------------------------------
+# Copy source code
+# ----------------------------------------------------
 COPY app/ app/
 
 EXPOSE 8080
 
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--log-level", "info"]
+# ----------------------------------------------------
+# Start FastAPI
+# ----------------------------------------------------
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]

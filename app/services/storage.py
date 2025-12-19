@@ -33,8 +33,9 @@ def get_client():
         # Ensure bucket exists
         try:
             _s3_client.head_bucket(Bucket=S3_BUCKET)
-        except ClientError:
-            _s3_client.create_bucket(Bucket=S3_BUCKET)
+        except ClientError as e:
+            if e.response["Error"]["Code"] != "404":
+                raise
 
     return _s3_client
 

@@ -51,7 +51,7 @@ async def infer(file: UploadFile = File(...)):
     cv2.imwrite(tmp_heatmap, heatmap)
     cv2.imwrite(tmp_overlay, overlay_img)
 
-    # ---- 5. Upload to MinIO ----
+    # ---- 5. Upload to S3 (Cloudflare R2) ----
     detect_url = upload_image(tmp_detect, f"{inference_id}/detect.jpg")
     heatmap_url = upload_image(tmp_heatmap, f"{inference_id}/heatmap.jpg")
     overlay_url = upload_image(tmp_overlay, f"{inference_id}/overlay.jpg")

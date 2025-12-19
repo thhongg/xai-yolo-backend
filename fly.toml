@@ -1,5 +1,4 @@
 app = "xai-yolo-backend"
-
 primary_region = "sin"
 
 [build]
@@ -17,10 +16,10 @@ primary_region = "sin"
     soft_limit = 10
     hard_limit = 20
 
-[checks]
-  [checks.http]
-    grace_period = "60s"
-    interval = "15s"
-    method = "GET"
-    path = "/health"
-    timeout = "120s"
+[checks.health]
+  type = "http"
+  interval = "15s"
+  timeout = "30s"
+  grace_period = "60s"
+  method = "GET"
+  path = "/health"

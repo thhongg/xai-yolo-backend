@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   xai-backend:
-    image: xai-yolo-backend:latest # ⭐ CỐ ĐỊNH IMAGE NAME
+    image: xai-yolo-backend:latest
     build:
       context: .
     container_name: xai-yolo-backend
@@ -10,22 +10,4 @@ services:
       - .env
     ports:
       - "8080:8080"
-    depends_on:
-      - minio
     restart: unless-stopped
-
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    command: server /data --console-address ":9001"
-    env_file:
-      - .env
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
-    restart: unless-stopped
-
-volumes:
-  minio_data:
