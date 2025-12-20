@@ -2,7 +2,7 @@
 https://xai-yolo-backend.fly.dev
 # sample request
 curl -X POST https://xai-yolo-backend.fly.dev/infer ^
--F "file=@<yourdir>:\<your_image>.jpg" 
+-F "file=<@your_dir>:\<your_image>.jpg" 
 # xai-yolo-backend
 
 Backend inference service for **YOLOv8m** with **EigenCAM (Explainable AI)**.
